@@ -18,15 +18,17 @@ This is an end to end demo with a few options on how to put together SRIOV and O
 
 6. Installing SRIOV operator
 
-7. Creating 
+7. Creating SRIOV network node policies
 
-7. Installing OpenShift Virtualization Operator
+8. Creating SRIOV networks
 
-8. Installing Hyperconverged Custom Resource
+9. Installing OpenShift Virtualization Operator
 
-9. Creating Virtual Machines with Additional Networks
+10. Installing Hyperconverged Custom Resource
 
-10. Exposing Virtual Machine Services
+11. Creating Virtual Machines with Additional Networks
+
+12. Exposing Virtual Machine Services
 
 
 
