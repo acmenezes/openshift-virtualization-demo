@@ -1,0 +1,22 @@
+apiVersion: nmstate.io/v1
+kind: NodeNetworkConfigurationPolicy
+metadata:
+  name: br1-mcx4-policy-master
+  namespace: sriov-guests
+spec:
+  nodeSelector:
+    node-role.kubernetes.io/master: ""
+  desiredState:
+    interfaces:
+      - name: mcx4-br1
+        description: Standard Linux Brige enp11s0f0np0 on Mellanox cx4
+        type: linux-bridge
+        state: up
+        ipv4:
+          enabled: false
+        bridge:
+          options:
+            stp:
+              enabled: false
+          port:
+            - name: enp11s0f0np0

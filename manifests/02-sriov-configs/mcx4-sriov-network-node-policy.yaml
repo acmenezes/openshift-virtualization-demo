@@ -1,0 +1,18 @@
+apiVersion: sriovnetwork.openshift.io/v1
+kind: SriovNetworkNodePolicy
+metadata:
+  name: policy-sriov-mcx4-enp11s0f0np0
+  namespace: openshift-sriov-network-operator
+spec:
+  deviceType: vfio-pci
+  isRdma: false
+  nicSelector:
+    deviceID: '1015'
+    pfNames:
+      - 'enp11s0f0np0#0-3'
+    vendor: '15b3' 
+  nodeSelector:
+    feature.node.kubernetes.io/network-sriov.capable: 'true'
+  numVfs: 16
+  priority: 97
+  resourceName: mcx4_enp11s0f0np0

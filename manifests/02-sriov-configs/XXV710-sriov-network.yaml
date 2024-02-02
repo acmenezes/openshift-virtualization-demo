@@ -1,0 +1,20 @@
+apiVersion: sriovnetwork.openshift.io/v1
+kind: SriovNetwork
+metadata:
+  name: xxv710-ens3f0-vlan23
+  namespace: openshift-sriov-network-operator
+spec:
+  ipam: |-
+    {
+      "ipam": {
+        "type": "static",
+          "addresses": [
+            {
+              "address": "191.168.23.11/24"
+            }
+          ]
+      }
+    }
+  networkNamespace: sriov-guests
+  resourceName: mcx4_enp11s0f0np0
+  vlan: 23

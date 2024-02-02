@@ -1,0 +1,51 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  creationTimestamp: null
+  labels:
+    kubevirt.io/vm: vm-fedora
+  name: vm-fedora
+  namespace: sriov-guests
+spec:
+  running: true
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:   
+        kubevirt.io/vm: vm-fedora
+    spec:
+      domain:
+        cpu:
+          cores: 6      
+        resources:
+          requests:
+            memory: 16384M
+        devices:
+          disks:
+          - name: containerdisk
+            disk: {}
+          - name: cloudinitdisk
+            disk:
+              bus: virtio
+          interfaces:
+          - name: sriov-nic01
+            sriov: {}          
+            # macAddress: 1e:b3:5d:4e:ce:23
+            model: virtio
+      networks:
+      - name: sriov-nic01
+        multus:
+          networkName: sriov-guests/xxv710-ens3f0-vlan23
+      volumes:
+        - name: containerdisk
+          containerDisk:
+            image: quay.io/acmenezes/fedora-container-disk:latest
+        - cloudInitNoCloud:
+            userData: |-
+              #cloud-config
+              user: fedora
+              password: fedora 
+              chpasswd: { expire: False }
+          name: cloudinitdisk
+
+                    

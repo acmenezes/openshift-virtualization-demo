@@ -1,0 +1,16 @@
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  name: network-attachment-vlan4-access
+  namespace: sriov-guests
+  annotations:
+    k8s.v1.cni.cncf.io/resourceName: bridge.network.kubevirt.io/mcx4-br1
+spec:
+  config: '{
+    "cniVersion": "0.3.1",
+    "name": "network-attachment-vlan4-access",
+    "type": "cnv-bridge",
+    "bridge": "mcx4-br1",
+    "macspoofchk": true,
+    "vlan": 4
+    }'
