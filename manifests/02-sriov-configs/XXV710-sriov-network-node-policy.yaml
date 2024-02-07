@@ -9,7 +9,7 @@ spec:
   nicSelector:
     deviceID: '158b'
     pfNames:
-      - 'ens3f0#0-31'
+      - 'ens3f0#0-63'
     vendor: '8086' 
   nodeSelector:
     feature.node.kubernetes.io/network-sriov.capable: 'true'

@@ -1,6 +1,6 @@
 # Creating Virtual Machines with SRIOV networks end to end
 
-This is an end to end demo with a few options on how to put together SRIOV and OpenShift Virtualization together. It's still under construction. More to come...
+This is an end to end demo with a few options on how to put together SRIOV and OpenShift Virtualization together. It's a work in progress. More to come...
 
 ## Contents
 
@@ -43,9 +43,11 @@ For our demo we used in single node OpenShift option (SNO) and we installed usin
 
 ### 4. Enabling SRIOV and CPU virtualization in the server BIOS <a name="enabling-sriov-bios"></a>
 
-The BIOS software depends on the server you have below I present an example on what that might look like.
+The BIOS software depends on the server you have. Here is an intel type:
 
-<!-- TODO: Insert images here. -->
+![sriov bios enabled](docs/img/sriov-bios.png)
+
+![virtualization bios enabled](docs/img/virtualization-bios.png)
 
 ### 5. Configuring OpenShift Worker nodes for OCP-V and SRIOV <a name="ocp-worker-sriov-config"></a>
 
@@ -68,24 +70,108 @@ Please refer to [Installing the sriov network operator](https://docs.openshift.c
 
 The sriov network node policy automates the configuration of the sriov devices available on the each worker node. It's important to label your nodes accordingly. In the example below the field nodeSelector will allow the manifest to be only applied on the nodes that contain the label `feature.node.kubernetes.io/network-sriov.capable: 'true'`. Other labels may be added for specific purposes and different device configurations.
 
-To create an sriov network node policy custom resource in OpenShift we need to find the vendor and device IDs for the sriov network interface card and those will be used by the nicSelector in order to find the right device. You have that information from the supported devices page but here is how you can discover them in the system if needed:
+To create an sriov network node policy custom resource in OpenShift we need to find the vendor and device IDs for the sriov network interface card and those will be used by the nicSelector in order to find the right device. You have that information from the supported devices page but here is how you can discover them in the system itself if needed:
+
+
+  a. Find the name of your node:
 
 `oc get nodes`
 
-<!-- TODO: insert output here -->
+```
+NAME         STATUS   ROLES                         AGE   VERSION
+pa-vnf-sno   Ready    control-plane,master,worker   6d    v1.27.9+e36e183
+
+```
+  b. run a debug pod with:
 
 `oc debug node/my-node-name`
 
-<!-- TODO: insert output here -->
+```
+Temporary namespace openshift-debug-9n6xp is created for debugging node...
+Starting pod/pa-vnf-sno-debug-6k6f9 ...
+To use host binaries, run `chroot /host`
+Pod IP: 192.168.23.10
+If you don't see a command prompt, try pressing enter.
+sh-4.4# 
+
+```
+
+c. once logged in change the root fs to the one on the host directory and run bash for a better shell. With that you have a terminal in the host OS of your SNO cluster.
 
 `chroot /host /bin/bash`
 
-<!-- TODO: insert output here -->
+```
+sh-4.4# chroot /host /bin/bash
+[root@pa-vnf-sno /]# 
+
+```
+
+d. Now we can verify the SRIOV devices, device ID and vendor ID. In the snippet below we show an intel card where the vendor ID is 8086 and the device ID is 158b.
 
 `lspci -nnv | grep -i ethernet`
 
-<!-- TODO: insert output here -->
+```
+18:00.0 Ethernet controller [0200]: Intel Corporation Ethernet Controller XXV710 for 25GbE SFP28 [8086:158b] (rev 02)    
+        Subsystem: Intel Corporation Ethernet Network Adapter XXV710-2 [8086:0001]                                       
+18:00.1 Ethernet controller [0200]: Intel Corporation Ethernet Controller XXV710 for 25GbE SFP28 [8086:158b] (rev 02)    
+        Subsystem: Intel Corporation Ethernet Network Adapter XXV710 [8086:0000]
 
+[... output truncated because of size...]         
+```
+
+  e. Make sure the cards have sriov and ARI enabled by using the device ID as below. Here is an exemple with an intel card:
+
+`lspci -nnv -d :158b
+```
+18:00.0 Ethernet controller [0200]: Intel Corporation Ethernet Controller XXV710 for 25GbE SFP28 [8086:158b] (rev 02)
+        Subsystem: Intel Corporation Ethernet Network Adapter XXV710-2 [8086:0001]
+        Flags: bus master, fast devsel, latency 0, IRQ 18, NUMA node 0, IOMMU group 19
+        Memory at a7000000 (64-bit, prefetchable) [size=16M]
+        Memory at a8808000 (64-bit, prefetchable) [size=32K]
+        Expansion ROM at a9000000 [disabled] [size=512K]
+        Capabilities: [40] Power Management version 3
+        Capabilities: [50] MSI: Enable- Count=1/1 Maskable+ 64bit+
+        Capabilities: [70] MSI-X: Enable+ Count=129 Masked-
+        Capabilities: [a0] Express Endpoint, MSI 00
+        Capabilities: [100] Advanced Error Reporting
+        Capabilities: [140] Device Serial Number 54-a4-26-ff-ff-b7-a6-40
+        Capabilities: [150] Alternative Routing-ID Interpretation (ARI)  <--- ARI
+        Capabilities: [160] Single Root I/O Virtualization (SR-IOV) <--- sriov
+        Capabilities: [1a0] Transaction Processing Hints
+        Capabilities: [1b0] Access Control Services
+        Capabilities: [1d0] Secondary PCI Express
+        Kernel driver in use: i40e
+        Kernel modules: i40e
+
+18:00.1 Ethernet controller [0200]: Intel Corporation Ethernet Controller XXV710 for 25GbE SFP28 [8086:158b] (rev 02)
+        Subsystem: Intel Corporation Ethernet Network Adapter XXV710 [8086:0000]
+        Flags: bus master, fast devsel, latency 0, IRQ 18, NUMA node 0, IOMMU group 20
+        Memory at a6000000 (64-bit, prefetchable) [size=16M]
+        Memory at a8800000 (64-bit, prefetchable) [size=32K]
+        Expansion ROM at a9080000 [disabled] [size=512K]
+        Capabilities: [40] Power Management version 3
+        Capabilities: [50] MSI: Enable- Count=1/1 Maskable+ 64bit+
+        Capabilities: [70] MSI-X: Enable+ Count=129 Masked-
+        Capabilities: [a0] Express Endpoint, MSI 00
+        Capabilities: [100] Advanced Error Reporting
+        Capabilities: [140] Device Serial Number 54-a4-26-ff-ff-b7-a6-40
+        Capabilities: [150] Alternative Routing-ID Interpretation (ARI)
+        Capabilities: [160] Single Root I/O Virtualization (SR-IOV)
+        Capabilities: [1a0] Transaction Processing Hints
+        Capabilities: [1b0] Access Control Services
+        Kernel driver in use: i40e
+        Kernel modules: i40e
+```
+  f. Create the SRIOV network node policy using the vendor and device IDs.
+  
+  A few comments on the example below:
+  
+  - pfNames is a wild card like name. enp3f0 is the actual interface in the system. Virtual functions will be created ranging from 0-31 in this example. We use a # symbol to separate the range. This avoid writing a tedious list with names increasing by 1 at each new VF. 
+  - nodeSelector will match the label on the node
+  - numVfs will configure the card to enable that many VFs. Check how many VFs your card can handle.
+  - the resource name is arbitrary. That is the name that will be used by the next step to create the network attachments for your VMs.
+
+Here goes an example with a Mellanox card:
 ```
 apiVersion: sriovnetwork.openshift.io/v1
 kind: SriovNetworkNodePolicy
@@ -98,7 +184,7 @@ spec:
   nicSelector:
     deviceID: '1015'
     pfNames:
-      - 'enp11s0f0np0#0-31'
+      - 'enp3f0#0-31'
     vendor: '15b3' 
   nodeSelector:
     feature.node.kubernetes.io/network-sriov.capable: 'true'
@@ -108,6 +194,7 @@ spec:
 ```
 OBS: your server may boot here... Kernel modules and firmware options need to be applied.
 
+Check if your policy was created.
 `oc get sriovnetworknodepolicy -n openshift-sriov-network-operator` 
 ```
 NAME                             AGE
@@ -225,11 +312,18 @@ For more in depth details on how to configure sriov networks please refer to con
 
 ### 9. Installing OpenShift Virtualization Operator <a name="ocp-virtualization-operator-install"></a>
 
-
+You can find here the instructions for the OpenShift virtualization operator.
 
 ### 10. Creating Virtual Machines with Additional Networks <a name="vm-additional-networks"></a>
 
+We have a few VM manifests in yaml format that can be used as a template to build other VMs by altering the images and its details under manifests/03-virtual-machines.
 
+Here is how you apply them to the cluster:
 
+`oc apply -f XXV710-vm-guest.yaml`
 
 ### 11. Exposing Virtual Machine Services <a name="exposing-vm-services"></a>
+
+Finally to expose a service from the VM we use a label to select the VMs like we do with a pod. Here is where you can find the step by step to do it:
+
+https://docs.openshift.com/container-platform/4.14/virt/vm_networking/virt-exposing-vm-with-service.html

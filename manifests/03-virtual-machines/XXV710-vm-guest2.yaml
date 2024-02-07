@@ -3,8 +3,8 @@ kind: VirtualMachine
 metadata:
   creationTimestamp: null
   labels:
-    kubevirt.io/vm: vm-fedora
-  name: vm-fedora
+    kubevirt.io/vm: vm-fedora-2
+  name: vm-fedora-2
   namespace: sriov-guests
 spec:
   running: true
@@ -12,8 +12,8 @@ spec:
     metadata:
       creationTimestamp: null
       labels:   
-        kubevirt.io/vm: vm-fedora
-        service: service-label
+        kubevirt.io/vm: vm-fedora-2
+        special: key
     spec:
       domain:
         cpu:
@@ -32,7 +32,7 @@ spec:
           - name: pod-network
             masquerade: {}
           - name: sriov-nic01
-            macAddress: 40:a6:b7:26:a4:56          
+            macAddress: 40:a6:b7:26:a4:57          
             model: virtio
             sriov: {}
       networks:
