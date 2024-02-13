@@ -1,7 +1,7 @@
 apiVersion: sriovnetwork.openshift.io/v1
 kind: SriovNetwork
 metadata:
-  name: xxv710-ens3f0-vlan50-dhcp
+  name: xxv710-ens3f0-vlan60-dhcp
   namespace: openshift-sriov-network-operator
 spec:
   ipam: |-
@@ -11,5 +11,5 @@ spec:
       }
     }
   networkNamespace: sriov-guests
-  resourceName: mcx4_enp11s0f0np0
-  vlan: 50
+  resourceName: xxv710-ens3f0
+  vlan: 60

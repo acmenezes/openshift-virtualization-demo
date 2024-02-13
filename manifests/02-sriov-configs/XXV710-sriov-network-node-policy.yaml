@@ -15,4 +15,4 @@ spec:
     feature.node.kubernetes.io/network-sriov.capable: 'true'
   numVfs: 64
   priority: 97
-  resourceName: mcx4_enp11s0f0np0
+  resourceName: xxv710-ens3f0

@@ -1,0 +1,63 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  creationTimestamp: null
+  labels:
+    kubevirt.io/vm: pa-ngfw
+  name: pa-ngfw
+  namespace: sriov-guests
+spec:
+  running: true
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:   
+        kubevirt.io/vm: pa-ngfw
+        service: ngfw
+    spec:
+      domain:
+        cpu:
+          cores: 6      
+        resources:
+          requests:
+            memory: 16384M
+        devices:
+          disks:
+          - name: containerdisk
+            disk: {}
+          interfaces:
+          - name: pod-network
+            masquerade: {}
+          - name: sriov-nic01       
+            model: virtio
+            sriov: {}
+          - name: sriov-nic02      
+            model: virtio
+            sriov: {}
+          - name: sriov-nic03       
+            model: virtio
+            sriov: {}
+          - name: sriov-nic04       
+            model: virtio
+            sriov: {}                                    
+      networks:
+      - name: pod-network
+        pod: {}
+      - name: sriov-nic01
+        multus:
+          networkName: sriov-guests/xxv710-ens3f0-vlan50-dhcp
+      - name: sriov-nic02
+        multus:
+          networkName: sriov-guests/xxv710-ens3f0-vlan60-dhcp
+      - name: sriov-nic03
+        multus:
+          networkName: sriov-guests/xxv710-ens3f0-vlan70-dhcp
+      - name: sriov-nic04
+        multus:
+          networkName: sriov-guests/xxv710-ens3f0-vlan80-dhcp                              
+      volumes:
+        - name: containerdisk
+          containerDisk:
+            image: quay.io/< your registry here >/ngfw:latest
+
+                    
