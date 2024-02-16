@@ -63,6 +63,25 @@ If you want to check if the label is actually in your node run:
 
 `oc describe node < your node name > | grep feature.node.kubernetes.io/network-sriov.capable=true`
 
+Another way of grouping the nodes by using labels is actually creating a new role for the actual node. That can be done by applying the node role sriov for example. Like below:
+
+```
+oc label node ocpv-sriov98 node-role.kubernetes.io/sriov=
+``` 
+```
+# oc get node                                              
+NAME           STATUS   ROLES                               AGE    VERSION
+ocpv-sriov98   Ready    control-plane,master,sriov,worker   156m   v1.27.10+28ed2d7
+```
+
+
+
+Now when checking the nodes you should see:
+
+
+
+
+
 To understand more on how to manage OpenShift nodes please check [here](https://docs.openshift.com/container-platform/4.14/nodes/nodes/nodes-nodes-viewing.html)
 
 ### 6. Installing SRIOV operator <a name="sriov-operator-install"></a>

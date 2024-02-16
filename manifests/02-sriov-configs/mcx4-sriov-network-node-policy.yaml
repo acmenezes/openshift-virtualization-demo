@@ -10,9 +10,9 @@ spec:
     deviceID: '1015'
     pfNames:
       - 'enp11s0f0np0#0-3'
-    vendor: '15b3' 
+    vendor: '15b3'
   nodeSelector:
     feature.node.kubernetes.io/network-sriov.capable: 'true'
-  numVfs: 16
+  numVfs: 6
   priority: 97
   resourceName: mcx4_enp11s0f0np0
