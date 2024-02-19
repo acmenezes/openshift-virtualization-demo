@@ -38,6 +38,8 @@ A second and also essential requirement is the SRIOV capable network card. For t
 
 For our demo we used in single node OpenShift option (SNO) and we installed using the OpenShift assisted installer. [Here](https://access.redhat.com/documentation/en-us/assisted_installer_for_openshift_container_platform/2024/html/installing_openshift_container_platform_with_the_assisted_installer/index) you can check it's full documentation for all options it offers and all of the requirements that must be in place before starting a new OpenShift installation. With a free customer account you can use a trial version of OpenShift for up to 60 days which enough time to develop a proof of concept or a demo project.
 
+But you have a valid subscription registered to your account you may check [here](https://access.redhat.com/solutions/6262561) how to manually activate your OpenShift cluster.
+
 ### 3. Supported SRIOV network cards and configuration <a name="sriov-cards"></a>
 
 [Here](https://access.redhat.com/documentation/en-us/openshift_container_platform/4.14/html/networking/hardware-networks#supported-devices_about-sriov) you can find the list of the sriov devices supported for OpenShift as well as the vendor and device IDs for them sparing us from checking on the host system.
