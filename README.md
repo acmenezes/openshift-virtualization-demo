@@ -22,9 +22,11 @@ This is an end to end demo with a few options on how to put together SRIOV and O
 
 9. [Installing OpenShift Virtualization Operator](#ocp-virtualization-operator-install)
 
-10. [Creating Virtual Machines with Additional Networks](#vm-additional-networks)
+10. [Creating container disk images for VMs](#container-disks)
 
-11. [Exposing Virtual Machine Services](#exposing-vm-services)
+11. [Creating Virtual Machines with Additional Networks](#vm-additional-networks)
+
+12. [Exposing Virtual Machine Services](#exposing-vm-services)
 
 ### 1. Requirements <a name="requirements"></a>
 
@@ -60,6 +62,25 @@ Here is how you can label your node:
 If you want to check if the label is actually in your node run:
 
 `oc describe node < your node name > | grep feature.node.kubernetes.io/network-sriov.capable=true`
+
+Another way of grouping the nodes by using labels is actually creating a new role for the actual node. That can be done by applying the node role sriov for example. Like below:
+
+```
+oc label node ocpv-sriov98 node-role.kubernetes.io/sriov=
+``` 
+```
+# oc get node                                              
+NAME           STATUS   ROLES                               AGE    VERSION
+ocpv-sriov98   Ready    control-plane,master,sriov,worker   156m   v1.27.10+28ed2d7
+```
+
+
+
+Now when checking the nodes you should see:
+
+
+
+
 
 To understand more on how to manage OpenShift nodes please check [here](https://docs.openshift.com/container-platform/4.14/nodes/nodes/nodes-nodes-viewing.html)
 
@@ -312,9 +333,73 @@ For more in depth details on how to configure sriov networks please refer to con
 
 ### 9. Installing OpenShift Virtualization Operator <a name="ocp-virtualization-operator-install"></a>
 
-You can find here the instructions for the OpenShift virtualization operator.
+You can find [here](https://docs.openshift.com/container-platform/4.14/virt/install/installing-virt.html) the instructions for the OpenShift virtualization operator.
 
-### 10. Creating Virtual Machines with Additional Networks <a name="vm-additional-networks"></a>
+### 10. Creating container disk images for VMs <a name="#container-disks"></a>
+
+Virtual machines require an operating system image to run. One of the ways we can bring an OS image to OpenShift platform and use it for virtualization is by embedding this operating system image into a container. In order to accomplish this step we need to have [podman](https://podman.io/docs/installation) installed. Once we have it we need the image source file in one of the two formats: [qcow2 or raw](https://access.redhat.com/documentation/en-us/red_hat_virtualization/4.4/html/technical_reference/qcow2) format.
+
+If you have your operating system image in ISO format you can covert it to qcow2 or raw by using the qemu image utility [qemu-img](https://www.qemu.org/docs/master/tools/qemu-img.html#cmdoption-qemu-img-arg-convert) and setting the [format](https://www.qemu.org/docs/master/system/images.html#disk-image-file-formats) for your use case. To install the tool you may have to use a package manager and search for qemu-img or qemu-utils package. For other operating systems check the official qemu [documentation](https://www.qemu.org/download/).
+
+Here is a simple example with the flag -O for output format. You can always check the full range of options and flags by running "qemu-img convert --help".
+
+```
+qemu-img convert -O qcow2 my_image.iso my_image.qcow2
+```
+
+All right. With a proper image file, in qcow2 or raw format we can build the container image with the operating system to be used for our virtual machines. For that we need to create a container file (a.k.a. Dockerfile) that copies our image file to that container image. Below we can see an example using an ubi8 image from Red Hat. Remark that we are changing the owner ID of that file before copying it. That's due to qemu default's User ID (UID) being 107. We change also the permissions to 440 which means that the user and its group are allowed to read only that file and nothing else. Then it's copied to the `/disk` directory.
+
+```
+FROM registry.access.redhat.com/ubi8/ubi:latest AS builder
+ADD --chown=107:107 <vm_image>.qcow2 /disk/ \
+RUN chmod 0440 /disk/*
+
+FROM scratch
+COPY --from=builder /disk/* /disk/
+```
+
+Once we have those lines above copied to a container file we can build the image using podman by running the commands below:
+
+```
+podman build -t <registry>/<container_disk_name>:latest .
+``` 
+
+```
+podman push <registry>/<container_disk_name>:latest
+``` 
+Example with Palo Alto Next Generation Firewall VM-Series (assuming we've already converted a file named ngfw.ISO to ngfw.qcow2).
+Here we use the command cat to create a Dockerfile on the current directory.
+
+```
+cat > Dockerfile << EOF
+FROM registry.access.redhat.com/ubi8/ubi:latest AS builder
+ADD --chown=107:107 ngfw.qcow2 /disk/ \
+RUN chmod 0440 /disk/*
+
+FROM scratch
+COPY --from=builder /disk/* /disk/
+EOF
+```
+Yet in the current directory we may run:
+
+```
+podman build -t quay.io/acmenezes/ngfw:latest .
+```
+-t is for tag and the dot in the end means it's context directory where it should look for the Dockerfile.
+
+You may check if the image is present in your local registry by running `podman image list`. 
+
+Finally push it to your registry:
+```
+podman push quay.io/acmenezes/ngfw:latest
+```
+
+One note: if you are new to containers, the container disk name is arbitrary. You may choose it according to your needs. The [registry](https://www.redhat.com/en/topics/cloud-native-apps/what-is-a-container-registry) is where we store container images for pulling them when we need. If you don't have a registry to push your container image you can create one on [quay.io](https://quay.io/) by registering a with a Red Hat account which you can create following quay.io sign in instructions.
+
+For more details please visit OpenShif docs on [Creating VMs by using container disks](https://docs.openshift.com/container-platform/4.14/virt/virtual_machines/creating_vms_custom/virt-creating-vms-from-container-disks.html#virt-preparing-container-disk-for-vms_virt-creating-vms-from-container-disks).
+
+
+### 11. Creating Virtual Machines with Additional Networks <a name="vm-additional-networks"></a>
 
 We have a few VM manifests in yaml format that can be used as a template to build other VMs by altering the images and its details under manifests/03-virtual-machines.
 
@@ -322,7 +407,7 @@ Here is how you apply them to the cluster:
 
 `oc apply -f XXV710-vm-guest.yaml`
 
-### 11. Exposing Virtual Machine Services <a name="exposing-vm-services"></a>
+### 12. Exposing Virtual Machine Services <a name="exposing-vm-services"></a>
 
 Finally to expose a service from the VM we use a label to select the VMs like we do with a pod. Here is where you can find the step by step to do it:
 

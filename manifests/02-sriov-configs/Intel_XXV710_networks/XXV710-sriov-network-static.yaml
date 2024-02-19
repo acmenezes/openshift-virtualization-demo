@@ -16,5 +16,5 @@ spec:
       }
     }
   networkNamespace: sriov-guests
-  resourceName: mcx4_enp11s0f0np0
+  resourceName: xxv710-ens3f0
   vlan: 23
