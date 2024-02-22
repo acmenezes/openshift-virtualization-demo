@@ -53,6 +53,17 @@ The BIOS software depends on the server you have. Here is an intel type:
 
 ![virtualization bios enabled](docs/img/virtualization-bios.png)
 
+
+Here you can find video sources on how to use the assisted installer to prepare a node for OCP Virtualization:
+
+[Bare Metal OpenShift Assited Installer Part 1](https://youtu.be/czE8MsOEFRQ)
+
+[Bare Metal OpenShift Assited Installer Part 2](https://youtu.be/Nd-Y1-ELeLg)
+
+[Bare Metal OpenShift Assited Installer Part 3](https://youtu.be/9rQBeuXR-A4)
+
+[Bare Metal OpenShift Assited Installer Part 4](https://youtu.be/AP0-rjMJZxs)
+
 ### 5. Configuring OpenShift Worker nodes for OCP-V and SRIOV <a name="ocp-worker-sriov-config"></a>
 
 One of the steps that is commonly done is to also label the nodes for the sriov network node policies to take effect on.
