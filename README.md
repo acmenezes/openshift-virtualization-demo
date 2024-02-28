@@ -18,7 +18,7 @@ This is an end to end demo with a few options on how to put together SRIOV and O
 
 7. [Creating SRIOV network node policies](#sriov-network-node-policies)
 
-8. [Creating SRIOV networks](#sriov-network-node-policies)
+8. [Creating SRIOV networks](#sriov-networks)
 
 9. [Installing OpenShift Virtualization Operator](#ocp-virtualization-operator-install)
 
@@ -64,6 +64,17 @@ Here you can find video sources on how to use the assisted installer to prepare 
 
 [Bare Metal OpenShift Assited Installer Part 4](https://youtu.be/AP0-rjMJZxs)
 
+Or for a shorter version:
+
+[Assited Installer short version Part 1](https://youtu.be/qPYtpWH0RC8)
+
+[Assited Installer short version Part 2](https://youtu.be/3MP_P2MbLCQ)
+
+Additional Steps if you're using IOMMU and hardware passthrough on virtualization:
+
+[Enabling intel iommu and iommu passthrough in OpenShift](https://youtu.be/e_ZpLOc17UQ)
+
+
 ### 5. Configuring OpenShift Worker nodes for OCP-V and SRIOV <a name="ocp-worker-sriov-config"></a>
 
 One of the steps that is commonly done is to also label the nodes for the sriov network node policies to take effect on.
@@ -87,22 +98,24 @@ NAME           STATUS   ROLES                               AGE    VERSION
 ocpv-sriov98   Ready    control-plane,master,sriov,worker   156m   v1.27.10+28ed2d7
 ```
 
-
-
-Now when checking the nodes you should see:
-
-
-
-
-
 To understand more on how to manage OpenShift nodes please check [here](https://docs.openshift.com/container-platform/4.14/nodes/nodes/nodes-nodes-viewing.html)
 
 ### 6. Installing SRIOV operator <a name="sriov-operator-install"></a>
 
-Please refer to [Installing the sriov network operator](https://docs.openshift.com/container-platform/4.14/networking/hardware_networks/installing-sriov-operator.html) docs.
+Here you find a video on how to install the SRIOV operator in OpenShift:
+
+[Installing SRIOV operator in OpenShift](https://youtu.be/OFEeuXUCmM4)
+
+Or you can refer to [Installing the sriov network operator](https://docs.openshift.com/container-platform/4.14/networking/hardware_networks/installing-sriov-operator.html) docs.
 ### 7. Creating SRIOV network node policies <a name="sriov-network-node-policies"></a>
 
 The sriov network node policy automates the configuration of the sriov devices available on the each worker node. It's important to label your nodes accordingly. In the example below the field nodeSelector will allow the manifest to be only applied on the nodes that contain the label `feature.node.kubernetes.io/network-sriov.capable: 'true'`. Other labels may be added for specific purposes and different device configurations.
+
+Here is a video where you can see that done:
+
+[Installing SRIOV network node policies in OpenShift](https://youtu.be/EeL-nr2K-KY)
+
+Or you can follow the instructions below.
 
 To create an sriov network node policy custom resource in OpenShift we need to find the vendor and device IDs for the sriov network interface card and those will be used by the nicSelector in order to find the right device. You have that information from the supported devices page but here is how you can discover them in the system itself if needed:
 
@@ -239,7 +252,12 @@ policy-sriov-mcx4-enp11s0f0np0   25m
 For more in depth details please refer to [configure an sriov device in OpenShift](https://docs.openshift.com/container-platform/4.14/networking/hardware_networks/configuring-sriov-device.html) docs.
 
 
-### 8. Creating SRIOV networks <a name="sriov-network-node-policies"></a>
+### 8. Creating SRIOV networks <a name="sriov-networks"></a>
+
+Here is a video showing how you can create SRIOV networks:
+
+[Creating SRIOV networks in OpenShift](https://youtu.be/baKkYimtDjY)
+
 
 The SRIOV network custom resource automates the creation of a network attachment definition for the guest VM namespace (or project in OpenShift). The network attachment definition (NAD for short) describes the behavior of additional networks to be added to the VMs. The NAD relies on [multus-cni](https://github.com/k8snetworkplumbingwg/multus-cni) to create additional networks. For more information on sriov network check [here](https://docs.openshift.com/container-platform/4.14/networking/hardware_networks/configuring-sriov-net-attach.html)
 
@@ -345,6 +363,10 @@ Events:             <none>
 For more in depth details on how to configure sriov networks please refer to configuring an [SR-IOV ethernet network attachment](https://docs.openshift.com/container-platform/4.14/networking/hardware_networks/configuring-sriov-net-attach.html) in OpenShift docs.
 
 ### 9. Installing OpenShift Virtualization Operator <a name="ocp-virtualization-operator-install"></a>
+
+Here is a video where you can see the OpenShift virtualization operator being installed:
+
+[Installing OpenShift Virtualization Operator](https://youtu.be/xUtUZMRCBGk)
 
 You can find [here](https://docs.openshift.com/container-platform/4.14/virt/install/installing-virt.html) the instructions for the OpenShift virtualization operator.
 

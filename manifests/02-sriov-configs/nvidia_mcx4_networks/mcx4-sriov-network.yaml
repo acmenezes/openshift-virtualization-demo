@@ -1,26 +1,15 @@
 apiVersion: sriovnetwork.openshift.io/v1
 kind: SriovNetwork
 metadata:
-  name: mcx4-enp11s0f0np0-vlan10-dhcp
+  name: mcx4-enp11s0f0np0-vlan4-dhcp
   namespace: openshift-sriov-network-operator
 spec:
   ipam: |-
     {
       "ipam": {
-        "type": "static",
-          "addresses": [
-            {
-              "address": "191.168.1.7/24"
-            }
-          ]
+        "type": "dhcp"
       }
     }
-  # ipam: |-
-  #   {
-  #     "ipam": {
-  #       "type": "dhcp"
-  #     }
-  #   }
   networkNamespace: sriov-guests
   resourceName: mcx4_enp11s0f0np0
   vlan: 4
